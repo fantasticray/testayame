@@ -2,21 +2,29 @@
     <head>
         <meta charset="utf-8">
         <title>Ayame Send/Recv Sample</title>
-        <link rel="stylesheet" href="https://cdn.rawgit.com/Chalarangelo/mini.css/v3.0.1/dist/mini-default.min.css">
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <script src="js/jquery/1.11.3/jquery.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
     </head>
     <body>
       <header class="sticky row">
-      <h4>Ayame Send/Recv Sample</h4>
+      <h4>Ayame Send/Recv Samaaaaaaaaaaple</h4>
       </header>
       <div>
-        <p>ルームID
+        <p>ルームIDa
         <input id="roomIdInput" type="text"></input>
         </p>
         <p>クライアントID
         <input id="clientIdInput" disabled type="text" value=""></input>
         </p>
-        <button onclick="startConn();">接続</button>
+        <button type="button" class="btn btn-primary" onclick="startConn();">接続</button>
         <button onclick="disconnect();">切断</button>
+        <p> 送信するメッセージ
+          <input id="sendDataInput" type="text" value="🐶"></input>
+          </p>
+          <button onclick="sendData();">送信</button>
+          <p> 受信したメッセージ </p>
+          <textarea style="height:200px;" id="messages" disabled type="text" value=""></textarea>
       </div>
       <div style="float:left;">
         <video id="local-video" autoplay="" style="width: 400px; height: 300px; border: 1px solid black;"></video>
@@ -24,7 +32,7 @@
       <div style="float:right;">
         <video id="remote-video" autoplay style="width: 400px; height: 300px; border: 1px solid black;"></video>
       </div>
-      <script src="https://cdn.jsdelivr.net/npm/@open-ayame/ayame-web-sdk@19.9.0/dist/ayame.min.js"></script>
+      <script src="js/ayame.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/qs/6.7.0/qs.min.js"></script>
       <script src="./main.js"></script>
       <script type="text/javascript">
@@ -39,7 +47,7 @@
         }
         const startConn = async () => {
           conn = Ayame.connection(signalingUrl, roomId, options, true);
-          const mediaStream = await navigator.mediaDevices.getUserMedia({audio: true, video: true})
+          const mediaStream = await navigator.mediaDevices.getUserMedia({audio: false, video: true})
           const authnMetadata = {hoge: "fuga"};
           conn.on('open', ({authzMetadata}) => console.log(authzMetadata));
           conn.on('disconnect', (e) => console.log(e));
@@ -52,11 +60,21 @@
               console.log('error auto play:' + error);
             }
           });
+          conn.on('data', (e) => {
+            messages = messages ? (messages + '\n' + e.data) : e.data;
+            new Audio("data:audio/wav;base64,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").play();
+            document.querySelector("#messages").value = messages;
+          });
           await conn.connect(mediaStream, { authnMetadata, key: signalingKey });
           document.querySelector('#local-video').srcObject = mediaStream;
         };
+        const sendData = () => {
+          const data = document.querySelector("#sendDataInput").value;
+          conn.sendData(data);
+        };
         document.querySelector("#roomIdInput").value = roomId;
         document.querySelector("#clientIdInput").value = options.clientId;
+        
       </script>
   </body>
 </html>
